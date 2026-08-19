@@ -54,6 +54,7 @@ services:
       - backend_gems:/usr/local/bundle
     command: >
       sh -c "
+        rm -f tmp/pids/server.pid &&
         bundle install &&
         bin/rails db:migrate &&
         bin/rails db:seed &&
