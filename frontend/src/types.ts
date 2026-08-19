@@ -15,7 +15,7 @@ export interface Expense {
 export interface ExpenseFormData {
   amount: string;
   description: string;
-  category: string;
+  categoryId: string;
   date: string;
 }
 

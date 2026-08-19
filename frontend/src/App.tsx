@@ -3,6 +3,7 @@ import Sidebar from "./components/Sidebar";
 import HistoryPage from "./pages/HistoryPage";
 import { COLORS } from "./constants/colors";
 import CategoryPage from "./pages/CategoryPage";
+import { CategoryProvider } from "./context/CategoryContext";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("history");
@@ -25,18 +26,20 @@ function App() {
   };
 
   return (
-    <div style={appStyle}>
-      <Sidebar
-        currentPage={currentPage}
-        onNavigate={setCurrentPage}
-        isCollapsed={isSidebarCollapsed}
-        onToggleCollapse={handleToggleSidebar}
-      />
-      <main style={mainStyle}>
-        {currentPage === "history" && <HistoryPage />}
-        {currentPage === "categories" && <CategoryPage />}
-      </main>
-    </div>
+    <CategoryProvider>
+      <div style={appStyle}>
+        <Sidebar
+          currentPage={currentPage}
+          onNavigate={setCurrentPage}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={handleToggleSidebar}
+        />
+        <main style={mainStyle}>
+          {currentPage === "history" && <HistoryPage />}
+          {currentPage === "categories" && <CategoryPage />}
+        </main>
+      </div>
+    </CategoryProvider>
   );
 }
 

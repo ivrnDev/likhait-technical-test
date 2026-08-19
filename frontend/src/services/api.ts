@@ -48,15 +48,9 @@ export async function fetchCategories(): Promise<Category[]> {
  * Create a new expense
  */
 export async function createExpense(data: ExpenseFormData): Promise<Expense> {
-  // Convert category name to category_id
-  const categories = await fetchCategories();
-  const category = categories.find((c) => c.name === data.category);
-
   const expenseData = {
-    description: data.description,
-    amount: data.amount,
-    category_id: category?.id,
-    date: data.date,
+    ...data,
+    category_id: data.categoryId ? Number(data.categoryId) : undefined,
   };
 
   const response = await fetch(`${API_BASE_URL}/expenses`, {
@@ -81,12 +75,17 @@ export async function updateExpense(
   id: number,
   data: Partial<ExpenseFormData>,
 ): Promise<Expense> {
+  const expenseData = {
+    ...data,
+    category_id: data.categoryId ? Number(data.categoryId) : undefined,
+  };
+
   const response = await fetch(`${API_BASE_URL}/expenses/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ expense: data }),
+    body: JSON.stringify({ expense: expenseData }),
   });
 
   if (!response.ok) {
@@ -108,3 +107,4 @@ export async function deleteExpense(id: number): Promise<void> {
     throw new Error("Failed to delete expense");
   }
 }
+
