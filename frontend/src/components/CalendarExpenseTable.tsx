@@ -5,7 +5,6 @@
 import React, { useState } from "react";
 import { Expense, ExpenseFormData } from "../types";
 import { formatCurrency, formatDate } from "../utils/expenseUtils";
-import { getCategoryEmoji } from "../constants/categoryEmojis";
 import { COLORS } from "../constants/colors";
 import { Button, Modal, Pagination } from "../vibes";
 import { ExpenseForm } from "./ExpenseForm.tsx";
@@ -142,8 +141,8 @@ export function CalendarExpenseTable({
                     gap: "0.5rem",
                   }}
                 >
-                  <span>{getCategoryEmoji(expense.category)}</span>
-                  <span>{expense.category}</span>
+                  <span>{expense.category?.emoji}</span>
+                  <span>{expense.category?.name}</span>
                 </span>
               </td>
               <td style={{ ...tdStyle, textAlign: "left", fontWeight: 600 }}>
@@ -191,7 +190,7 @@ export function CalendarExpenseTable({
             initialData={{
               amount: editingExpense.amount.toString(),
               description: editingExpense.description,
-              category: editingExpense.category,
+              category: editingExpense.category.name,
               date: formatDate(new Date(editingExpense.date)),
             }}
             onSubmit={handleUpdate}
