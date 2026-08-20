@@ -84,58 +84,66 @@ RSpec.describe "Api::Categories", type: :request do
   describe "PATCH /api/categories/:id" do
     let!(:category) { Category.create!(name: "Food", emoji: "🍔") }
 
-    it "updates the category" do
-      patch "/api/categories/#{category.id}",
-        params: {
-          category: {
-            name: "Restaurants",
-            emoji: "🍽️"
-          }
-        },
-        as: :json
+    context "with valid parameters" do
+      it "updates the category" do
+        patch "/api/categories/#{category.id}",
+          params: {
+            category: {
+              name: "Restaurants",
+              emoji: "🍽️"
+            }
+          },
+          as: :json
 
-      expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(:success)
 
-      json = JSON.parse(response.body)
+        json = JSON.parse(response.body)
 
-      expect(json["name"]).to eq("Restaurants")
-      expect(json["emoji"]).to eq("🍽️")
+        expect(json["name"]).to eq("Restaurants")
+        expect(json["emoji"]).to eq("🍽️")
 
-      category.reload
+        category.reload
 
-      expect(category.name).to eq("Restaurants")
-      expect(category.emoji).to eq("🍽️")
+        expect(category.name).to eq("Restaurants")
+        expect(category.emoji).to eq("🍽️")
+      end
     end
 
-    it "returns not found for a nonexistent category" do
-      patch "/api/categories/999999",
-        params: {
-          category: {
-            name: "Restaurants",
-            emoji: "🍽️"
-          }
-        },
-        as: :json
+    context "with a nonexistent category" do
+      it "returns not found" do
+        patch "/api/categories/999999",
+          params: {
+            category: {
+              name: "Restaurants",
+              emoji: "🍽️"
+            }
+          },
+          as: :json
 
-      expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:not_found)
+      end
     end
   end
 
   describe "DELETE /api/categories/:id" do
     let!(:category) { Category.create!(name: "Food", emoji: "🍔") }
 
-    it "deletes the category" do
-      expect {
-        delete "/api/categories/#{category.id}"
-      }.to change(Category, :count).by(-1)
+    context "with an existing category" do
+      it "deletes the category" do
+        expect {
+          delete "/api/categories/#{category.id}"
+        }.to change(Category, :count).by(-1)
 
-      expect(response).to have_http_status(:no_content)
+        expect(response).to have_http_status(:no_content)
+      end
     end
 
-    it "returns not found for a nonexistent category" do
-      delete "/api/categories/999999"
+    context "with a nonexistent category" do
+      it "returns not found" do
+        delete "/api/categories/999999"
 
-      expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:not_found)
+      end
     end
   end
 end
