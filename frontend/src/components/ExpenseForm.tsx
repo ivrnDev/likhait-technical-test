@@ -3,10 +3,10 @@
  */
 
 import React from "react";
-import { ExpenseFormData } from "../types";
-import { EXPENSE_CATEGORIES } from "../constants/categories";
+import { Category, ExpenseFormData } from "../types";
 import { TextField, SelectBox, Button } from "../vibes";
 import { useExpenseForm } from "../hooks/useExpenseForm";
+import { useCategories } from "../context/CategoryContext";
 
 interface ExpenseFormProps {
   initialData?: Partial<ExpenseFormData>;
@@ -21,6 +21,8 @@ export function ExpenseForm({
   onCancel,
   submitLabel = "Add Expense",
 }: ExpenseFormProps) {
+  const { categories } = useCategories();
+  
   const { formData, errors, isSubmitting, handleChange, handleSubmit } =
     useExpenseForm({
       initialData,
@@ -39,10 +41,11 @@ export function ExpenseForm({
     marginTop: "0.5rem",
   };
 
-  const categoryOptions = EXPENSE_CATEGORIES.map((category) => ({
-    value: category,
-    label: category,
+  const categoryOptions = categories.map((category) => ({
+    value: category.id.toString(),
+    label: `${category.name}`,
   }));
+  
 
   return (
     <form onSubmit={handleSubmit} style={formStyle}>
@@ -72,9 +75,9 @@ export function ExpenseForm({
       <SelectBox
         label="Category"
         options={categoryOptions}
-        value={formData.category}
-        onChange={(e) => handleChange("category", e.target.value)}
-        error={errors.category}
+        value={formData.categoryId}
+        onChange={(e) => handleChange("categoryId", e.target.value)}
+        error={errors.categoryId?.toString()}
         fullWidth
         required
       />
