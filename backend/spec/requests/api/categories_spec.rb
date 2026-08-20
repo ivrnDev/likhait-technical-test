@@ -23,42 +23,61 @@ RSpec.describe "Api::Categories", type: :request do
     end
   end
 
-   describe "POST /api/categories" do
-    let(:valid_params) do
-      {
-        category: {
-          name: "Entertainment",
-          emoji: "🎬"
+  describe "POST /api/categories" do
+    context "with valid parameters" do
+      let(:valid_params) do
+        {
+          category: {
+            name: "Entertainment",
+            emoji: "🎬"
+          }
         }
-      }
+      end
+
+      it "creates a category" do
+        expect {
+          post "/api/categories", params: valid_params, as: :json
+        }.to change(Category, :count).by(1)
+
+        expect(response).to have_http_status(:created)
+
+        json = JSON.parse(response.body)
+
+        expect(json["name"]).to eq("Entertainment")
+        expect(json["emoji"]).to eq("🎬")
+      end
     end
 
-    it "creates a category" do
-      expect {
-        post "/api/categories", params: valid_params, as: :json
-      }.to change(Category, :count).by(1)
-
-      expect(response).to have_http_status(:created)
-
-      json = JSON.parse(response.body)
-
-      expect(json["name"]).to eq("Entertainment")
-      expect(json["emoji"]).to eq("🎬")
-    end
-
-    it "does not create a category with invalid parameters" do
-      invalid_params = {
-        category: {
-          name: "",
-          emoji: ""
+    context "with invalid parameters" do
+      it "does not create a category with an empty name" do
+        invalid_params = {
+          category: {
+            name: "",
+            emoji: "🎬"
+          }
         }
-      }
 
-      expect {
-        post "/api/categories", params: invalid_params, as: :json
-      }.not_to change(Category, :count)
+        expect {
+          post "/api/categories", params: invalid_params, as: :json
+        }.not_to change(Category, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it "does not create a category with an empty emoji" do
+        invalid_params = {
+          category: {
+            name: "Entertainment",
+            emoji: ""
+          }
+        }
+
+        expect {
+          post "/api/categories", params: invalid_params, as: :json
+        }.not_to change(Category, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
     end
   end
 
