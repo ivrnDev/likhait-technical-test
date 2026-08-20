@@ -2,10 +2,12 @@
  * Form component for adding/editing categories
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { CategoryFormData } from "../types";
 import { TextField, Button } from "../vibes";
 import { useCategoryForm } from "../hooks/useCategoryForm";
+import EmojiPicker from "emoji-picker-react";
+import { COLORS } from "../constants/colors";
 
 interface CategoryFormProps {
   initialData?: Partial<CategoryFormData>;
@@ -20,6 +22,7 @@ export function CategoryForm({
   onCancel,
   submitLabel = "Add Category",
 }: CategoryFormProps) {
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const { formData, errors, isSubmitting, handleChange, handleSubmit } =
     useCategoryForm({
       initialData,
@@ -30,6 +33,25 @@ export function CategoryForm({
     display: "flex",
     flexDirection: "column",
     gap: "1rem",
+  };
+
+  const emojiPreviewStyle: React.CSSProperties = {
+    width: "100%",
+    minHeight: "80px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "left",
+    padding: "0 20px",
+    border: "1px solid #e5e7eb",
+    borderRadius: "0.5rem",
+    backgroundColor: "#f9fafb",
+    cursor: "pointer",
+    transition: "background-color 0.2s",
+  };
+
+  const emojiPickerContainerStyle: React.CSSProperties = {
+    width: "100%",
+    height: "435px",
   };
 
   const buttonGroupStyle: React.CSSProperties = {
@@ -51,16 +73,68 @@ export function CategoryForm({
         required
       />
 
-      <TextField
-        label="Emoji"
-        type="text"
-        placeholder="Enter an emoji"
-        value={formData.emoji}
-        onChange={(e) => handleChange("emoji", e.target.value)}
-        error={errors.emoji}
-        fullWidth
-        required
-      />
+      <div>
+        <label
+          style={{
+            display: "block",
+            marginBottom: "0.5rem",
+            fontWeight: 500,
+          }}
+        >
+          Emoji
+        </label>
+
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label="Select emoji"
+          style={emojiPreviewStyle}
+          onClick={() => setShowEmojiPicker((prev) => !prev)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setShowEmojiPicker((prev) => !prev);
+            }
+          }}
+        >
+          <span style={{ fontSize: "2.5rem" }}>{formData.emoji || "🙂"}</span>
+
+          <span
+            style={{
+              marginLeft: "0.75rem",
+              color: COLORS.text.secondary,
+              fontSize: "0.9rem",
+            }}
+          >
+            {formData.emoji ? "Selected emoji" : "Select an emoji"}
+          </span>
+        </div>
+
+        {errors.emoji && (
+          <div
+            style={{
+              marginTop: "0.25rem",
+              fontSize: "0.875rem",
+              color: "#dc2626",
+            }}
+          >
+            {errors.emoji}
+          </div>
+        )}
+      </div>
+
+      {showEmojiPicker && (
+        <div style={emojiPickerContainerStyle}>
+          <EmojiPicker
+            width="100%"
+            height="100%"
+            onEmojiClick={(emojiData) => {
+              handleChange("emoji", emojiData.emoji);
+              setShowEmojiPicker(false);
+            }}
+          />
+        </div>
+      )}
 
       <div style={buttonGroupStyle}>
         <Button
