@@ -15,7 +15,7 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
   const [formData, setFormData] = useState<ExpenseFormData>({
     amount: initialData?.amount || "",
     description: initialData?.description || "",
-    category: initialData?.category || "",
+    categoryId: initialData?.categoryId || "",
     date: initialData?.date || formatDate(new Date()),
   });
 
@@ -32,6 +32,7 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
 
   const validateForm = (): boolean => {
     const newErrors: Partial<ExpenseFormData> = {};
+    const today = formatDate(new Date());
 
     if (!formData.amount || Number(formData.amount) <= 0) {
       newErrors.amount = "Amount must be greater than 0";
@@ -41,12 +42,15 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
       newErrors.description = "Description is required";
     }
 
-    if (!formData.category) {
-      newErrors.category = "Category is required";
+    if (!formData.categoryId) {
+      newErrors.categoryId = "Category is required";
     }
 
     if (!formData.date) {
       newErrors.date = "Date is required";
+    } else if (formData.date > today) {
+      newErrors.date =
+        "Expense date cannot be in the future. Please select today or an earlier date.";
     }
 
     setErrors(newErrors);
@@ -67,7 +71,7 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
       setFormData({
         amount: "",
         description: "",
-        category: "",
+        categoryId: "",
         date: formatDate(new Date()),
       });
       setErrors({});
@@ -82,7 +86,7 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
     setFormData({
       amount: initialData?.amount || "",
       description: initialData?.description || "",
-      category: initialData?.category || "",
+      categoryId: initialData?.categoryId || "",
       date: initialData?.date || formatDate(new Date()),
     });
     setErrors({});
