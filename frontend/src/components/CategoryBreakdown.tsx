@@ -1,9 +1,9 @@
 import React from "react";
-import { CATEGORY_EMOJIS } from "../constants/categoryEmojis";
 import { COLORS } from "../constants/colors";
 
 interface CategoryData {
   category: string;
+  emoji: string;
   amount: number;
   count: number;
 }
@@ -200,7 +200,7 @@ const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
             >
               <div style={itemInfoStyle}>
                 <span style={itemIconStyle}>
-                  {CATEGORY_EMOJIS[category.category] || "📊"}
+                  {category.emoji || "📊"}
                 </span>
                 <div style={itemDetailsStyle}>
                   <div style={itemNameStyle}>{category.category}</div>
