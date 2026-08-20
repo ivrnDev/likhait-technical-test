@@ -71,7 +71,7 @@ RSpec.describe "Api::Expenses", type: :request do
     end
 
     context "with invalid parameters" do
-      it "with negative amounts" do
+      it "does not create an expense with a negative amount" do
         invalid_params = {
           expense: {
             description: "Invalid expense",
@@ -83,12 +83,12 @@ RSpec.describe "Api::Expenses", type: :request do
 
         expect {
           post "/api/expenses", params: invalid_params, as: :json
-        }.to change(Expense, :count).by(1)
+        }.not_to change(Expense, :count)
 
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(:unprocessable_entity)
       end
 
-      it "with empty descriptions" do
+      it "does not create an expense with empty descriptions" do
         invalid_params = {
           expense: {
             description: "",
@@ -100,9 +100,25 @@ RSpec.describe "Api::Expenses", type: :request do
 
         expect {
           post "/api/expenses", params: invalid_params, as: :json
-        }.to change(Expense, :count).by(1)
+        }.not_to change(Expense, :count)
 
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it "does not create an expense without a category" do
+        invalid_params = {
+          expense: {
+            description: "Uncategorized expense",
+            amount: 100.00,
+            date: Date.today
+          }
+        }
+
+        expect {
+          post "/api/expenses", params: invalid_params, as: :json
+        }.not_to change(Expense, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
       end
 
       it "with future dates" do
