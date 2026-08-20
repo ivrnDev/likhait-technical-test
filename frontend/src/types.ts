@@ -50,3 +50,8 @@ export interface Category {
   created_at: string;
   updated_at: string;
 }
+
+export interface CategoryFormData {
+  name: string;
+  emoji: string;
+}
