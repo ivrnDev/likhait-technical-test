@@ -4,9 +4,9 @@ import HistoryPage from "./pages/HistoryPage";
 import { COLORS } from "./constants/colors";
 import CategoryPage from "./pages/CategoryPage";
 import { CategoryProvider } from "./context/CategoryContext";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("history");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const appStyle: React.CSSProperties = {
@@ -29,14 +29,17 @@ function App() {
     <CategoryProvider>
       <div style={appStyle}>
         <Sidebar
-          currentPage={currentPage}
-          onNavigate={setCurrentPage}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={handleToggleSidebar}
         />
         <main style={mainStyle}>
-          {currentPage === "history" && <HistoryPage />}
-          {currentPage === "categories" && <CategoryPage />}
+          <Routes>
+            <Route path="/history" element={<HistoryPage />} />
+            <Route path="/categories" element={<CategoryPage />} />
+
+            {/* Default route */}
+            <Route path="*" element={<Navigate to="/history" replace />} />
+          </Routes>
         </main>
       </div>
     </CategoryProvider>

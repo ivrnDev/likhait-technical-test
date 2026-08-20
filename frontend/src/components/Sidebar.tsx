@@ -1,21 +1,20 @@
 import React from "react";
 import { COLORS } from "../constants/colors";
+import { NavLink } from "react-router-dom";
 
 interface SidebarProps {
-  onNavigate?: (page: string) => void;
-  currentPage?: string;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
 }
 interface NavigationItem {
-  id: string;
+  path: string;
   label: string;
   icon: React.ReactNode;
 }
 
 const navigationItems: NavigationItem[] = [
   {
-    id: "history",
+    path: "/history",
     label: "History",
     icon: (
       <svg
@@ -34,7 +33,7 @@ const navigationItems: NavigationItem[] = [
     ),
   },
   {
-    id: "categories",
+    path: "/categories",
     label: "Categories",
     icon: (
       <svg
@@ -55,8 +54,6 @@ const navigationItems: NavigationItem[] = [
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({
-  onNavigate,
-  currentPage = "history",
   isCollapsed = false,
   onToggleCollapse,
 }) => {
@@ -139,7 +136,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     alignItems: "center",
     justifyContent: isCollapsed ? "center" : "flex-start",
     gap: "16px",
-    background: currentPage === "history" ? COLORS.primary.p03 : "transparent",
     border: "none",
     cursor: "pointer",
     fontSize: "18px",
@@ -186,28 +182,18 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       <nav style={navStyle}>
         {navigationItems.map((item) => (
-          <button
-            key={item.id}
-            style={{
+          <NavLink
+            key={item.path}
+            to={item.path}
+            style={({ isActive }) => ({
               ...navItemStyle,
-              background:
-                currentPage === item.id ? COLORS.primary.p03 : "transparent",
-            }}
-            onClick={() => onNavigate?.(item.id)}
-            onMouseEnter={(e) => {
-              if (currentPage !== item.id) {
-                e.currentTarget.style.background = COLORS.primary.p02;
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (currentPage !== item.id) {
-                e.currentTarget.style.background = "transparent";
-              }
-            }}
+              background: isActive ? COLORS.primary.p03 : "transparent",
+              textDecoration: "none",
+            })}
           >
             {item.icon}
             <span style={navTextStyle}>{item.label}</span>
-          </button>
+          </NavLink>
         ))}
       </nav>
     </aside>
