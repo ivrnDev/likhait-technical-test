@@ -3,7 +3,7 @@
  */
 
 import React from "react";
-import { Category, ExpenseFormData } from "../types";
+import { ExpenseFormData } from "../types";
 import { TextField, SelectBox, Button } from "../vibes";
 import { useExpenseForm } from "../hooks/useExpenseForm";
 import { useCategories } from "../context/CategoryContext";
@@ -22,7 +22,7 @@ export function ExpenseForm({
   submitLabel = "Add Expense",
 }: ExpenseFormProps) {
   const { categories } = useCategories();
-  
+
   const { formData, errors, isSubmitting, handleChange, handleSubmit } =
     useExpenseForm({
       initialData,
@@ -45,10 +45,9 @@ export function ExpenseForm({
     value: category.id.toString(),
     label: `${category.name}`,
   }));
-  
 
   return (
-    <form onSubmit={handleSubmit} style={formStyle}>
+    <form onSubmit={handleSubmit} style={formStyle} noValidate>
       <TextField
         label="Amount"
         type="number"
@@ -88,6 +87,7 @@ export function ExpenseForm({
         value={formData.date}
         onChange={(e) => handleChange("date", e.target.value)}
         error={errors.date}
+        max={new Date().toISOString().split("T")[0]}
         fullWidth
         required
       />
