@@ -25,6 +25,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({
       setCategories(data);
     } catch (error) {
       console.error("Error fetching categories:", error);
+      throw error;
     } finally {
       setLoading(false);
     }
