@@ -9,9 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "emoji-picker-react": "^4.19.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.0"
+    "react-router-dom": "^6.30.6"
   },
   "devDependencies": {
     "@types/react": "^18.2.55",
@@ -19,5 +20,8 @@
     "@vitejs/plugin-react": "^4.2.1",
     "typescript": "^5.3.3",
     "vite": "^5.1.0"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-musl": "4.9.5"
   }
 }

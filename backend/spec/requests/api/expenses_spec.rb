@@ -1,12 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe "Api::Expenses", type: :request do
-  let!(:food_category) { Category.create!(name: "Food") }
-  let!(:transport_category) { Category.create!(name: "Transport") }
+  let!(:food_category) { Category.create!(name: "Food", emoji: "🍔") }
+  let!(:transport_category) { Category.create!(name: "Transport", emoji: "🚗") }
 
   describe "GET /api/expenses" do
-  let!(:expense1) { Expense.create!(description: "Lunch", amount: 100.00, category: food_category, date: Date.today) }
-  let!(:expense2) { Expense.create!(description: "Taxi", amount: 50.00, category: transport_category, date: Date.today) }
+  let!(:expense1) { Expense.create!(description: "Lunch", amount: 100.00, category: food_category, date: Date.yesterday, created_at: Time.new(2026, 8, 19, 10, 0, 0)) }
+  let!(:expense2) { Expense.create!(description: "Taxi", amount: 50.00, category: transport_category, date: Date.today, created_at: Time.new(2026, 8, 19, 9, 0, 0)) }
 
     it "returns all expenses with category information" do
       get "/api/expenses"
@@ -16,10 +16,30 @@ RSpec.describe "Api::Expenses", type: :request do
       expect(json.length).to eq(2)
     end
 
-    it "returns expenses in descending order by created_at" do
+    it "returns expenses in descending order by date" do
+
       get "/api/expenses"
 
       json = JSON.parse(response.body)
+      expect(json.first["id"]).to eq(expense2.id)
+      expect(json.last["id"]).to eq(expense1.id)
+    end
+
+    it "returns expenses in descending order by created_at when dates are the same" do
+      expense1.update!(
+        date: Date.today,
+        created_at: 2.hours.ago
+      )
+
+      expense2.update!(
+        date: Date.today,
+        created_at: 1.hour.ago
+      )
+
+      get "/api/expenses"
+
+      json = JSON.parse(response.body)
+
       expect(json.first["id"]).to eq(expense2.id)
       expect(json.last["id"]).to eq(expense1.id)
     end
@@ -46,12 +66,12 @@ RSpec.describe "Api::Expenses", type: :request do
         expect(response).to have_http_status(:created)
         json = JSON.parse(response.body)
         expect(json["description"]).to eq("Team Lunch")
-        expect(json["amount"]).to eq("150.5")
+        expect(json["amount"]).to eq(150.5)
       end
     end
 
     context "with invalid parameters" do
-      it "with negative amounts" do
+      it "does not create an expense with a negative amount" do
         invalid_params = {
           expense: {
             description: "Invalid expense",
@@ -63,12 +83,12 @@ RSpec.describe "Api::Expenses", type: :request do
 
         expect {
           post "/api/expenses", params: invalid_params, as: :json
-        }.to change(Expense, :count).by(1)
+        }.not_to change(Expense, :count)
 
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(:unprocessable_entity)
       end
 
-      it "with empty descriptions" do
+      it "does not create an expense with empty descriptions" do
         invalid_params = {
           expense: {
             description: "",
@@ -80,9 +100,42 @@ RSpec.describe "Api::Expenses", type: :request do
 
         expect {
           post "/api/expenses", params: invalid_params, as: :json
-        }.to change(Expense, :count).by(1)
+        }.not_to change(Expense, :count)
 
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it "does not create an expense without a category" do
+        invalid_params = {
+          expense: {
+            description: "Uncategorized expense",
+            amount: 100.00,
+            date: Date.today
+          }
+        }
+
+        expect {
+          post "/api/expenses", params: invalid_params, as: :json
+        }.not_to change(Expense, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it "with future dates" do
+        invalid_params = {
+          expense: {
+            description: "Future expense",
+            amount: 100.00,
+            category_id: food_category.id,
+            date: Date.tomorrow
+          }
+        }
+
+        expect {
+          post "/api/expenses", params: invalid_params, as: :json
+        }.not_to change(Expense, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end
